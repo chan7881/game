@@ -2,9 +2,12 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
   <title>Survival Dodge Game</title>
   <style>
+    * {
+      box-sizing: border-box;
+    }
     body, html {
       margin: 0;
       padding: 0;
@@ -12,58 +15,77 @@
       background: #111;
       font-family: Arial, sans-serif;
       color: white;
+      height: 100%;
+      width: 100%;
     }
     #startScreen, #rankingScreen {
       position: absolute;
       top: 0;
       left: 0;
-      width: 100%;
-      height: 100%;
+      width: 100vw;
+      height: 100vh;
       background: rgba(0,0,0,0.9);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       z-index: 20;
+      padding: 2vh;
     }
     #nicknameInput, #adminPasswordInput {
-      padding: 10px;
-      font-size: 16px;
-      margin-bottom: 10px;
+      padding: 1vh;
+      font-size: 2vh;
+      margin-bottom: 1vh;
+      width: 60vw;
+      max-width: 300px;
     }
     #startButton, #restartButton, #adminButton, #submitPasswordButton {
-      padding: 10px 20px;
-      font-size: 16px;
+      padding: 1vh 2vh;
+      font-size: 2vh;
       cursor: pointer;
-      margin: 5px;
+      margin: 0.5vh;
+      min-width: 100px;
     }
     #countdown {
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      font-size: 48px;
+      font-size: 6vh;
       z-index: 15;
+      text-align: center;
     }
     #timerDisplay {
       position: absolute;
-      top: 10px;
+      top: 1vh;
       left: 50%;
       transform: translateX(-50%);
-      font-size: 20px;
+      font-size: 2.5vh;
       z-index: 5;
+      text-align: center;
     }
     #gameCanvas {
       display: block;
       margin: auto;
       background: #222;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 90vw;
+      max-width: 500px;
+      height: auto;
+      aspect-ratio: 1;
+      touch-action: none;
     }
     #joystick {
       position: absolute;
-      bottom: 30px;
-      right: 30px;
-      width: 100px;
-      height: 100px;
+      bottom: 5vh;
+      right: 5vw;
+      width: 20vw;
+      height: 20vw;
+      max-width: 100px;
+      max-height: 100px;
       background: rgba(255,255,255,0.1);
       border-radius: 50%;
       touch-action: none;
@@ -71,8 +93,8 @@
     }
     #joystick .stick {
       position: absolute;
-      width: 40px;
-      height: 40px;
+      width: 40%;
+      height: 40%;
       background: rgba(255,255,255,0.6);
       border-radius: 50%;
       top: 50%;
@@ -82,6 +104,7 @@
     #rankingList {
       color: white;
       text-align: center;
+      max-width: 90vw;
     }
     .delete-button {
       margin-left: 10px;
@@ -90,6 +113,7 @@
     }
   </style>
 </head>
+<body>
 <body>
   <div id="startScreen">
     <input type="text" id="nicknameInput" placeholder="Enter Nickname" />
@@ -166,7 +190,7 @@
     });
 
     submitPasswordButton.addEventListener('click', () => {
-      if (adminPasswordInput.value === '3361') {
+      if (adminPasswordInput.value === '1234') {
         adminMode = true;
         renderRankingList();
       } else {
