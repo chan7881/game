@@ -5,120 +5,72 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
   <title>Survival Dodge Game</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
     body, html {
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-      background: #111;
-      font-family: Arial, sans-serif;
-      color: white;
-      height: 100%;
-      width: 100%;
+      margin: 0; padding: 0; overflow: hidden;
+      background: #111; color: white; font-family: Arial, sans-serif;
+      height: 100%; width: 100%;
     }
     #startScreen, #rankingScreen {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
+      position: absolute; top: 0; left: 0;
+      width: 100vw; height: 100vh;
       background: rgba(0,0,0,0.9);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      z-index: 20;
-      padding: 2vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      z-index: 20; padding: 2vh;
     }
     #nicknameInput, #adminPasswordInput {
-      padding: 1vh;
-      font-size: 2vh;
-      margin-bottom: 1vh;
-      width: 60vw;
-      max-width: 300px;
+      padding: 1vh; font-size: 2vh;
+      margin-bottom: 1vh; width: 60vw; max-width: 300px;
     }
     #startButton, #restartButton, #adminButton, #submitPasswordButton {
-      padding: 1vh 2vh;
-      font-size: 2vh;
-      cursor: pointer;
-      margin: 0.5vh;
-      min-width: 100px;
+      padding: 1vh 2vh; font-size: 2vh;
+      cursor: pointer; margin: 0.5vh; min-width: 100px;
     }
     #countdown {
-      position: absolute;
-      top: 50%;
-      left: 50%;
+      position: absolute; top: 50%; left: 50%;
       transform: translate(-50%, -50%);
-      font-size: 6vh;
-      z-index: 15;
-      text-align: center;
+      font-size: 6vh; z-index: 15; text-align: center;
     }
     #timerDisplay {
-      position: absolute;
-      top: 1vh;
-      left: 50%;
+      position: absolute; top: 1vh; left: 50%;
       transform: translateX(-50%);
-      font-size: 2.5vh;
-      z-index: 5;
-      text-align: center;
+      font-size: 2.5vh; z-index: 5; text-align: center;
     }
     #gameCanvas {
-      display: block;
-      margin: auto;
-      background: #222;
-      position: absolute;
-      top: 50%;
-      left: 50%;
+      display: block; margin: auto; background: #222;
+      position: absolute; top: 50%; left: 50%;
       transform: translate(-50%, -50%);
-      width: 90vw;
-      max-width: 500px;
-      height: auto;
-      aspect-ratio: 1;
-      touch-action: none;
+      width: 90vw; max-width: 500px;
+      aspect-ratio: 1; touch-action: none;
     }
     #joystick {
-      position: absolute;
-      bottom: 5vh;
-      right: 5vw;
-      width: 20vw;
-      height: 20vw;
-      max-width: 100px;
-      max-height: 100px;
+      position: absolute; bottom: 5vh; right: 5vw;
+      width: 20vw; height: 20vw;
+      max-width: 100px; max-height: 100px;
       background: rgba(255,255,255,0.1);
-      border-radius: 50%;
-      touch-action: none;
-      z-index: 10;
+      border-radius: 50%; touch-action: none; z-index: 10;
     }
     #joystick .stick {
-      position: absolute;
-      width: 40%;
-      height: 40%;
+      position: absolute; width: 40%; height: 40%;
       background: rgba(255,255,255,0.6);
-      border-radius: 50%;
-      top: 50%;
-      left: 50%;
+      border-radius: 50%; top: 50%; left: 50%;
       transform: translate(-50%, -50%);
     }
     #rankingList {
-      color: white;
-      text-align: center;
-      max-width: 90vw;
+      color: white; text-align: center; max-width: 90vw;
     }
     .delete-button {
-      margin-left: 10px;
-      color: red;
-      cursor: pointer;
+      margin-left: 10px; color: red; cursor: pointer;
     }
   </style>
 </head>
-<body>
 <body>
   <div id="startScreen">
     <input type="text" id="nicknameInput" placeholder="Enter Nickname" />
     <button id="startButton">Start Game</button>
   </div>
+
   <div id="rankingScreen" style="display: none;">
     <h2>Game Over</h2>
     <div id="rankingList"></div>
@@ -131,12 +83,11 @@
       <button id="submitPasswordButton">Submit</button>
     </div>
   </div>
+
   <div id="countdown"></div>
   <div id="timerDisplay"></div>
   <canvas id="gameCanvas" width="500" height="500"></canvas>
-  <div id="joystick">
-    <div class="stick"></div>
-  </div>
+  <div id="joystick"><div class="stick"></div></div>
 
   <script>
     const canvas = document.getElementById('gameCanvas');
@@ -161,16 +112,7 @@
     let playerRank = 0;
     let adminMode = false;
 
-    const player = {
-      x: 250,
-      y: 250,
-      radius: 2.5,
-      vx: 0,
-      vy: 0,
-      ax: 0,
-      ay: 0
-    };
-
+    const player = { x: 250, y: 250, radius: 2.5, vx: 0, vy: 0, ax: 0, ay: 0 };
     let bullets = [];
 
     document.getElementById('startButton').addEventListener('click', () => {
@@ -207,20 +149,21 @@
         if (count === 0) {
           clearInterval(interval);
           countdown.innerText = '';
-          gameStarted = true;
-          timeElapsed = 0;
-          lastBulletTime = 0;
-          gameOver = false;
-          bullets = [];
-          player.x = 250;
-          player.y = 250;
-          player.vx = 0;
-          player.vy = 0;
-          player.ax = 0;
-          player.ay = 0;
-          requestAnimationFrame(update);
+          startGame();
         }
       }, 1000);
+    }
+
+    function startGame() {
+      gameStarted = true;
+      gameOver = false;
+      timeElapsed = 0;
+      lastBulletTime = 0;
+      bullets = [];
+      player.x = 250; player.y = 250;
+      player.vx = 0; player.vy = 0;
+      player.ax = 0; player.ay = 0;
+      requestAnimationFrame(update);
     }
 
     function spawnBullet() {
@@ -241,6 +184,7 @@
 
     function update() {
       if (!gameStarted || gameOver) return;
+
       ctx.fillStyle = 'rgba(0, 0, 0, 0.03)';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -249,14 +193,8 @@
       player.x += player.vx;
       player.y += player.vy;
 
-      if (player.x <= 0 || player.x >= 500) {
-        player.vx *= -1;
-        player.x = Math.max(0, Math.min(500, player.x));
-      }
-      if (player.y <= 0 || player.y >= 500) {
-        player.vy *= -1;
-        player.y = Math.max(0, Math.min(500, player.y));
-      }
+      if (player.x <= 0 || player.x >= 500) { player.vx *= -1; player.x = Math.max(0, Math.min(500, player.x)); }
+      if (player.y <= 0 || player.y >= 500) { player.vy *= -1; player.y = Math.max(0, Math.min(500, player.y)); }
 
       ctx.beginPath();
       ctx.arc(player.x, player.y, player.radius, 0, Math.PI * 2);
@@ -292,11 +230,14 @@
     }
 
     function handleGameOver() {
-      const score = (timeElapsed / 1000).toFixed(2);
-      const rankData = JSON.parse(localStorage.getItem('rankings') || '[]');
-      rankData.push({ name: nickname, score: parseFloat(score) });
+      const score = parseFloat((timeElapsed / 1000).toFixed(2));
+      let rankData = JSON.parse(localStorage.getItem('rankings') || '[]');
+      rankData.push({ name: nickname, score });
+      rankData = rankData.filter((entry, index, self) =>
+        index === self.findIndex(e => e.name === entry.name && e.score === entry.score)
+      );
       rankData.sort((a, b) => b.score - a.score);
-      playerRank = rankData.findIndex(r => r.name === nickname && r.score === parseFloat(score)) + 1;
+      playerRank = rankData.findIndex(r => r.name === nickname && r.score === score) + 1;
       localStorage.setItem('rankings', JSON.stringify(rankData.slice(0, 100)));
       renderRankingList();
       rankingScreen.style.display = 'flex';
@@ -316,6 +257,7 @@
       renderRankingList();
     };
 
+    // Joystick
     const joystick = document.getElementById('joystick');
     const stick = joystick.querySelector('.stick');
     let dragging = false;
@@ -347,30 +289,24 @@
 
     joystick.addEventListener('touchend', () => {
       dragging = false;
-      stick.style.left = '50%';
-      stick.style.top = '50%';
-      player.ax = 0;
-      player.ay = 0;
+      stick.style.left = '50%'; stick.style.top = '50%';
+      player.ax = 0; player.ay = 0;
     });
 
     joystick.addEventListener('mousedown', e => {
       dragging = true;
-      startX = e.clientX;
-      startY = e.clientY;
+      startX = e.clientX; startY = e.clientY;
     });
 
     window.addEventListener('mousemove', e => {
-      if (!dragging) return;
-      moveStick(e.clientX - startX, e.clientY - startY);
+      if (dragging) moveStick(e.clientX - startX, e.clientY - startY);
     });
 
     window.addEventListener('mouseup', () => {
       if (dragging) {
         dragging = false;
-        stick.style.left = '50%';
-        stick.style.top = '50%';
-        player.ax = 0;
-        player.ay = 0;
+        stick.style.left = '50%'; stick.style.top = '50%';
+        player.ax = 0; player.ay = 0;
       }
     });
   </script>
