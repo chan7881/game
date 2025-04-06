@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>생존 회피 게임</title>
+  <style>
+    body {
+      background: #000;
+      color: #fff;
+      font-family: sans-serif;
+      text-align: center;
+    }
+    canvas {
+      background: #111;
+      display: block;
+      margin: 10px auto;
+    }
+    #joystick {
+      position: absolute;
+      bottom: 60px;
+      right: 60px;
+      width: 100px;
+      height: 100px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 50%;
+      touch-action: none;
+    }
+    #stick {
+      width: 40px;
+      height: 40px;
+      background: rgba(255,255,255,0.5);
+      border-radius: 50%;
+      position: absolute;
+      top: 30px;
+      left: 30px;
+      transform: translate(-50%, -50%);
+    }
+  </style>
+</head>
+<body>
+  <h1>생존 회피 게임</h1>
+  <input id="nickname" placeholder="닉네임 입력" />
+  <button onclick="startGame()">게임 시작</button>
+  <div id="timer">Time: 0.00s</div>
+  <canvas id="game" width="500" height="500"></canvas>
+  <div id="joystick"><div id="stick"></div></div>
+  <h3>랭킹</h3>
+  <ol id="ranking"></ol>
+
+  <script>
+    const canvas = document.getElementById("game");
+    const ctx = canvas.getContext("2d");
+    const nicknameInput = document.getElementById("nickname");
+    const timerDisplay = document.getElementById("timer");
+    const rankingList = document.getElementById("ranking");
+    const joystick = document.getElementById("joystick");
+    const stick = document.getElementById("stick");
+
+    let player = {
+      x: 250, y: 250, vx: 0, vy: 0, ax: 0, ay: 0, radius: 2.5
+    };
+    let bullets = [];
+    let gameStarted = false;
+    let gameOver = false;
+    let timeElapsed = 0;
+    let lastBulletTime = 0;
+    let trail = [];
+
+    function spawnBullet() {
+      let angle = Math.random() * 2 * Math.PI;
+      let speed = 1 + timeElapsed / 5000;
+      let fromEdge = Math.floor(Math.random() * 4);
+      let x, y;
+      if (fromEdge === 0) { x = 0; y = Math.random() * 500; }
+      else if (fromEdge === 1) { x = 500; y = Math.random() * 500; }
+      else if (fromEdge === 2) { x = Math.random() * 500; y = 0; }
+      else { x = Math.random() * 500; y = 500; }
+
+      bullets.push({
+        x, y,
+        vx: speed * Math.cos(angle),
+        vy: speed * Math.sin(angle),
+        radius: 5
+      });
+    }
+
+    function update() {
+      if (!gameStarted || gameOver) return;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // 잔상 추가 및 제거
+      const now = Date.now();
+      trail.push({ x: player.x, y: player.y, time: now });
+      trail = trail.filter(p => now - p.time < 1000);
+      trail.forEach(p => {
+        const age = now - p.time;
+        const alpha = 1 - age / 1000;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, player.radius, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255,255,255,${alpha})`;
+        ctx.fill();
+      });
+
+      // 물리 적용
+      player.vx += player.ax;
+      player.vy += player.ay;
+      player.x += player.vx;
+      player.y += player.vy;
+
+      // 경계 충돌
+      if (player.x <= 0 || player.x >= 500) {
+        player.vx *= -1;
+        player.x = Math.max(0, Math.min(500, player.x));
+      }
+      if (player.y <= 0 || player.y >= 500) {
+        player.vy *= -1;
+        player.y = Math.max(0, Math.min(500, player.y));
+      }
+
+      // 플레이어 그리기
+      ctx.beginPath();
+      ctx.arc(player.x, player.y, player.radius, 0, Math.PI * 2);
+      ctx.fillStyle = 'white';
+      ctx.fill();
+
+      // 탄알 처리
+      bullets = bullets.filter(b => b.x >= -100 && b.x <= 600 && b.y >= -100 && b.y <= 600);
+      bullets.forEach(b => {
+        b.x += b.vx;
+        b.y += b.vy;
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, b.radius, 0, Math.PI * 2);
+        ctx.fillStyle = 'red';
+        ctx.fill();
+        const dx = player.x - b.x;
+        const dy = player.y - b.y;
+        if (Math.sqrt(dx * dx + dy * dy) < player.radius + b.radius) {
+          gameOver = true;
+          gameStarted = false;
+          handleGameOver();
+        }
+      });
+
+      timeElapsed += 16;
+      timerDisplay.innerText = `Time: ${(timeElapsed / 1000).toFixed(2)}s`;
+
+      if (timeElapsed - lastBulletTime > Math.max(1000 - timeElapsed / 20, 300)) {
+        spawnBullet();
+        lastBulletTime = timeElapsed;
+      }
+
+      requestAnimationFrame(update);
+    }
+
+    function startGame() {
+      const nickname = nicknameInput.value.trim();
+      if (!nickname) {
+        alert("닉네임을 입력하세요!");
+        return;
+      }
+      // 초기화
+      player = { x: 250, y: 250, vx: 0, vy: 0, ax: 0, ay: 0, radius: 2.5 };
+      bullets = [];
+      trail = [];
+      gameStarted = true;
+      gameOver = false;
+      timeElapsed = 0;
+      lastBulletTime = 0;
+      timerDisplay.innerText = "Time: 0.00s";
+      update();
+    }
+
+    function handleGameOver() {
+      const nickname = nicknameInput.value.trim();
+      const time = (timeElapsed / 1000).toFixed(2);
+      const scores = JSON.parse(localStorage.getItem("scores") || "[]");
+      scores.push({ name: nickname, time: parseFloat(time) });
+      scores.sort((a, b) => b.time - a.time);
+      localStorage.setItem("scores", JSON.stringify(scores.slice(0, 10)));
+      renderRanking();
+      alert(`게임 오버! 생존 시간: ${time}s`);
+    }
+
+    function renderRanking() {
+      const scores = JSON.parse(localStorage.getItem("scores") || "[]");
+      rankingList.innerHTML = "";
+      scores.forEach(s => {
+        const li = document.createElement("li");
+        li.innerText = `${s.name}: ${s.time}s`;
+        rankingList.appendChild(li);
+      });
+    }
+
+    renderRanking();
+
+    // 조이스틱 컨트롤
+    let dragging = false;
+    joystick.addEventListener("touchstart", (e) => {
+      dragging = true;
+    });
+    joystick.addEventListener("touchmove", (e) => {
+      if (!dragging) return;
+      const rect = joystick.getBoundingClientRect();
+      const touch = e.touches[0];
+      const dx = touch.clientX - (rect.left + rect.width / 2);
+      const dy = touch.clientY - (rect.top + rect.height / 2);
+      const max = 40;
+      const clampedX = Math.max(-max, Math.min(max, dx));
+      const clampedY = Math.max(-max, Math.min(max, dy));
+      stick.style.transform = `translate(${clampedX}px, ${clampedY}px)`;
+      player.ax = clampedX * 0.001;
+      player.ay = clampedY * 0.001;
+    });
+    joystick.addEventListener("touchend", () => {
+      dragging = false;
+      stick.style.transform = "translate(-50%, -50%)";
+      player.ax = 0;
+      player.ay = 0;
+    });
+  </script>
+</body>
+</html>
