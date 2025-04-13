@@ -193,8 +193,14 @@
       player.x += player.vx;
       player.y += player.vy;
 
-      if (player.x <= 0 || player.x >= 500) { player.vx *= -1; player.x = Math.max(0, Math.min(500, player.x)); }
-      if (player.y <= 0 || player.y >= 500) { player.vy *= -1; player.y = Math.max(0, Math.min(500, player.y)); }
+      if (player.x <= 0 || player.x >= 500) {
+          gameOver = true;
+          gameStarted = false;
+          handleGameOver(); }
+      if (player.y <= 0 || player.y >= 500) {
+          gameOver = true;
+          gameStarted = false;
+          handleGameOver(); }
 
       ctx.beginPath();
       ctx.arc(player.x, player.y, player.radius, 0, Math.PI * 2);
