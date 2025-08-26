@@ -8,60 +8,121 @@
     * { box-sizing: border-box; }
     body, html {
       margin: 0; padding: 0; overflow: hidden;
-      background: #111; color: white; font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #0f2027 0%, #2c5364 100%);
+      color: #e0f7fa;
+      font-family: 'Orbitron', 'Segoe UI', Arial, sans-serif;
       height: 100%; width: 100%;
     }
     #startScreen, #rankingScreen {
       position: absolute; top: 0; left: 0;
       width: 100vw; height: 100vh;
-      background: rgba(0,0,0,0.9);
+      background: rgba(20,30,50,0.92);
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
       z-index: 20; padding: 2vh;
+      border-radius: 24px;
+      box-shadow: 0 4px 32px #00eaff44, 0 1px 8px #0008;
+      border: 1.5px solid #00eaff88;
+      backdrop-filter: blur(8px);
     }
     #nicknameInput, #adminPasswordInput {
       padding: 1vh; font-size: 2vh;
-      margin-bottom: 1vh; width: 60vw; max-width: 300px;
+      margin-bottom: 1vh; width: 60vw; max-width: 320px;
+      background: #101c2c;
+      color: #00eaff;
+      border: 1.5px solid #00eaff88;
+      border-radius: 10px;
+      outline: none;
+      transition: border 0.2s;
+    }
+    #nicknameInput:focus, #adminPasswordInput:focus {
+      border: 1.5px solid #00ffd0;
+      background: #162a3a;
     }
     #startButton, #restartButton, #adminButton, #submitPasswordButton {
       padding: 1vh 2vh; font-size: 2vh;
-      cursor: pointer; margin: 0.5vh; min-width: 100px;
+      cursor: pointer; margin: 0.5vh; min-width: 120px;
+      background: linear-gradient(90deg, #00eaff 0%, #0055ff 100%);
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      font-family: 'Orbitron', 'Segoe UI', Arial, sans-serif;
+      font-weight: 600;
+      box-shadow: 0 2px 12px #00eaff44;
+      letter-spacing: 1px;
+      transition: background 0.2s, box-shadow 0.2s;
+    }
+    #startButton:hover, #restartButton:hover, #adminButton:hover, #submitPasswordButton:hover {
+      background: linear-gradient(90deg, #00ffd0 0%, #0055ff 100%);
+      box-shadow: 0 4px 24px #00eaff88;
     }
     #countdown {
       position: absolute; top: 50%; left: 50%;
       transform: translate(-50%, -50%);
       font-size: 6vh; z-index: 15; text-align: center;
+      color: #00ffd0;
+      text-shadow: 0 0 16px #00eaff88;
+      font-family: 'Orbitron', Arial, sans-serif;
     }
     #timerDisplay {
       position: absolute; top: 1vh; left: 50%;
       transform: translateX(-50%);
       font-size: 2.5vh; z-index: 5; text-align: center;
+      color: #00ffd0;
+      text-shadow: 0 0 8px #00eaff88;
+      font-family: 'Orbitron', Arial, sans-serif;
     }
     #gameCanvas {
-      display: block; margin: auto; background: #222;
+      display: block; margin: auto; background: #181f2a;
       position: absolute; top: 50%; left: 50%;
       transform: translate(-50%, -50%);
-      width: 90vw; max-width: 500px;
+      width: 90vw; max-width: 520px;
       aspect-ratio: 1; touch-action: none;
+      border-radius: 24px;
+      box-shadow: 0 4px 32px #00eaff22, 0 1px 8px #0008;
+      border: 2px solid #00eaff88;
     }
     #joystick {
       position: absolute; bottom: 5vh; right: 5vw;
-      width: 20vw; height: 20vw;
-      max-width: 100px; max-height: 100px;
-      background: rgba(255,255,255,0.1);
+      width: 22vw; height: 22vw;
+      max-width: 110px; max-height: 110px;
+      background: rgba(0,238,255,0.12);
       border-radius: 50%; touch-action: none; z-index: 10;
+      box-shadow: 0 2px 12px #00eaff44;
+      border: 2px solid #00eaff88;
+      display: flex; align-items: center; justify-content: center;
     }
     #joystick .stick {
-      position: absolute; width: 40%; height: 40%;
-      background: rgba(255,255,255,0.6);
+      position: absolute; width: 44%; height: 44%;
+      background: linear-gradient(135deg, #00eaff 0%, #0055ff 100%);
       border-radius: 50%; top: 50%; left: 50%;
       transform: translate(-50%, -50%);
+      box-shadow: 0 2px 12px #00eaff44;
+      border: 2px solid #00ffd0;
     }
     #rankingList {
-      color: white; text-align: center; max-width: 90vw;
+      color: #e0f7fa; text-align: center; max-width: 90vw;
+      font-family: 'Orbitron', Arial, sans-serif;
+      background: rgba(20,30,50,0.85);
+      border-radius: 14px;
+      padding: 12px 18px;
+      box-shadow: 0 2px 12px #00eaff22;
+      border: 1px solid #00eaff44;
+      margin-bottom: 12px;
     }
     .delete-button {
-      margin-left: 10px; color: red; cursor: pointer;
+      margin-left: 10px; color: #ff2e88; cursor: pointer;
+      font-weight: bold;
+      font-size: 1.1em;
+      text-shadow: 0 0 6px #ff2e88aa;
+      border-radius: 4px;
+      padding: 2px 6px;
+      background: rgba(255,46,136,0.08);
+      border: 1px solid #ff2e88;
+      transition: background 0.2s;
+    }
+    .delete-button:hover {
+      background: rgba(255,46,136,0.22);
     }
   </style>
 </head>
@@ -185,8 +246,13 @@
     function update() {
       if (!gameStarted || gameOver) return;
 
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.03)';
+      // 근미래적 네온 효과 배경
+      ctx.save();
+      ctx.fillStyle = 'rgba(15,32,39,0.12)';
+      ctx.shadowColor = '#00eaff';
+      ctx.shadowBlur = 24;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.restore();
 
       player.vx += player.ax;
       player.vy += player.ay;
@@ -202,22 +268,48 @@
           gameStarted = false;
           handleGameOver(); }
 
+      // 플레이어: 네온 원
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(player.x, player.y, player.radius * 2.2, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(0,238,255,0.85)';
+      ctx.shadowColor = '#00eaff';
+      ctx.shadowBlur = 18;
+      ctx.fill();
+      ctx.restore();
+      ctx.save();
       ctx.beginPath();
       ctx.arc(player.x, player.y, player.radius, 0, Math.PI * 2);
-      ctx.fillStyle = 'white';
+      ctx.fillStyle = '#fff';
+      ctx.shadowColor = '#00ffd0';
+      ctx.shadowBlur = 8;
       ctx.fill();
+      ctx.restore();
 
       bullets = bullets.filter(b => b.x >= -100 && b.x <= 600 && b.y >= -100 && b.y <= 600);
       bullets.forEach(b => {
         b.x += b.vx;
         b.y += b.vy;
+        // 네온 탄환
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, b.radius * 1.7, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255,46,136,0.85)';
+        ctx.shadowColor = '#ff2e88';
+        ctx.shadowBlur = 16;
+        ctx.fill();
+        ctx.restore();
+        ctx.save();
         ctx.beginPath();
         ctx.arc(b.x, b.y, b.radius, 0, Math.PI * 2);
-        ctx.fillStyle = 'red';
+        ctx.fillStyle = '#ff2e88';
+        ctx.shadowColor = '#ff2e88';
+        ctx.shadowBlur = 6;
         ctx.fill();
+        ctx.restore();
         const dx = player.x - b.x;
         const dy = player.y - b.y;
-        if (Math.sqrt(dx * dx + dy * dy) < player.radius + b.radius) {
+        if (Math.sqrt(dx * dx + dy * dy) < player.radius + b.radius * 1.7) {
           gameOver = true;
           gameStarted = false;
           handleGameOver();
